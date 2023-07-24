@@ -1,24 +1,2517 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Midi Piano</title>
   <script src="script.js" defer></script>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-  <div class="piano">
-    <div data-note="C" class="key white"></div>
-    <div data-note="Db" class="key black"></div>
-    <div data-note="D" class="key white"></div>
-    <div data-note="Eb" class="key black"></div>
-    <div data-note="E" class="key white"></div>
-    <div data-note="F" class="key white"></div>
-    <div data-note="Gb" class="key black"></div>
-    <div data-note="G" class="key white"></div>
-    <div data-note="Ab" class="key black"></div>
-    <div data-note="A" class="key white"></div>
-    <div data-note="Bb" class="key black"></div>
-    <div data-note="B" class="key white"></div>
+  <div id="hplogo" tabindex="0" aria-label="Eunice Newton Foote's 204th Birthday" role="region" dir="ltr"
+    class="lightboxMode">
+    <style>
+      .hplogocta {
+        width: 100%;
+        height: 100%;
+        -webkit-background-size: contain;
+        background-size: contain;
+        background-position: center;
+        border: none;
+        overflow: hidden;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 10;
+        cursor: pointer;
+        padding: 0;
+        -webkit-transition: opacity .5s;
+        -o-transition: opacity .5s;
+        transition: opacity .5s;
+        opacity: 0;
+        pointer-events: auto
+      }
+
+      .hplogocta.showCta {
+        opacity: 1
+      }
+
+      .hplogocta.ctaHideDuringLightbox {
+        display: none
+      }
+
+      .closeFullscreenBtn {
+        pointer-events: all;
+        cursor: pointer;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        z-index: 3000
+      }
+
+      .domRootLightboxed {
+        left: 0;
+        top: 0
+      }
+
+      .contentHide {
+        display: none
+      }
+
+      #ddlDomRoot {
+        pointer-events: none
+      }
+
+      .lightboxMode,
+      #hplogo.lightboxMode {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        z-index: 1000;
+        overflow: hidden
+      }
+
+      .lightboxContentContainer {
+        position: relative;
+        height: 100%;
+        width: 100%
+      }
+
+      .lightboxEnabled .lightboxContentContainer {
+        height: 90%;
+        width: 90%
+      }
+
+      .lightboxContent {
+        -webkit-transform-origin: 0 0;
+        -ms-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        transform-origin: 0 0
+      }
+
+      .lightboxContainer {
+        position: absolute;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0
+      }
+
+      .lightboxBackground {
+        opacity: 0;
+        background-color: rgba(0, 0, 0, .8)
+      }
+
+      .lightboxEnabled {
+        opacity: 1;
+        -webkit-transition: opacity .5s;
+        -o-transition: opacity .5s;
+        transition: opacity .5s
+      }
+
+      .ddl-share-modal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+        align-items: center
+      }
+
+      .ddl-modal-overlay {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        left: 0;
+        top: 0;
+        background: #000;
+        border-radius: 0;
+        opacity: .32;
+        -webkit-transition: opacity .15s;
+        -o-transition: opacity .15s;
+        transition: opacity .15s;
+        -webkit-animation: ddl-overlay-fade-in .15s 1;
+        animation: ddl-overlay-fade-in .15s 1
+      }
+
+      .ddl-closing .ddl-modal-overlay {
+        opacity: 0
+      }
+
+      @-webkit-keyframes ddl-overlay-fade-in {
+        0% {
+          opacity: 0
+        }
+
+        to {
+          opacity: .32
+        }
+      }
+
+      @keyframes ddl-overlay-fade-in {
+        0% {
+          opacity: 0
+        }
+
+        to {
+          opacity: .32
+        }
+      }
+
+      .ddl-modal-dialog {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: column;
+        flex-direction: column;
+        -webkit-box-align: start;
+        -webkit-align-items: flex-start;
+        align-items: flex-start;
+        margin: 0 0 24px;
+        isolation: isolate;
+        position: absolute;
+        width: 364px;
+        height: 328px;
+        left: 88px;
+        top: 308px;
+        background: #fff;
+        border-radius: 16px;
+        opacity: 1;
+        -webkit-transition: opacity .15s;
+        -o-transition: opacity .15s;
+        transition: opacity .15s;
+        -webkit-animation: ddl-dialog-fade-in 83ms 1, ddl-dialog-grow-in .15s 1;
+        animation: ddl-dialog-fade-in 83ms 1, ddl-dialog-grow-in .15s 1;
+        overflow: hidden
+      }
+
+      @-webkit-keyframes ddl-dialog-fade-in {
+        0% {
+          opacity: 0
+        }
+
+        to {
+          opacity: 1
+        }
+      }
+
+      @keyframes ddl-dialog-fade-in {
+        0% {
+          opacity: 0
+        }
+
+        to {
+          opacity: 1
+        }
+      }
+
+      @-webkit-keyframes ddl-dialog-grow-in {
+        0% {
+          scale: .8
+        }
+
+        to {
+          scale: 1
+        }
+      }
+
+      @keyframes ddl-dialog-grow-in {
+        0% {
+          scale: .8
+        }
+
+        to {
+          scale: 1
+        }
+      }
+
+      .ddl-closing .ddl-modal-dialog {
+        opacity: 0
+      }
+
+      .ddl-modal-header {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: row;
+        flex-direction: row;
+        -webkit-box-align: start;
+        -webkit-align-items: flex-start;
+        align-items: flex-start;
+        padding-top: 12px;
+        padding-bottom: 0;
+        -webkit-padding-start: 24px;
+        -moz-padding-start: 24px;
+        padding-inline-start: 24px;
+        -webkit-padding-end: 12px;
+        -moz-padding-end: 12px;
+        padding-inline-end: 12px;
+        height: 61px;
+        -webkit-box-flex: 0;
+        -webkit-flex: none;
+        flex: none;
+        -webkit-box-ordinal-group: 1;
+        -webkit-order: 0;
+        order: 0;
+        -webkit-align-self: stretch;
+        align-self: stretch;
+        -webkit-flex-grow: 0;
+        flex-grow: 0;
+        z-index: 0
+      }
+
+      .ddl-modal-header-text {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: row;
+        flex-direction: row;
+        -webkit-box-align: end;
+        -webkit-align-items: flex-end;
+        align-items: flex-end;
+        padding: 12px 0 0;
+        gap: 10px;
+        width: 280px;
+        height: 36px;
+        -webkit-box-flex: 0;
+        -webkit-flex: none;
+        flex: none;
+        -webkit-box-ordinal-group: 1;
+        -webkit-order: 0;
+        order: 0;
+        -webkit-box-flex: 1;
+        -webkit-flex-grow: 1;
+        flex-grow: 1;
+        font-family: Google Sans;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 28px;
+        line-height: 36px
+      }
+
+      .ddl-modal-close {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: column;
+        flex-direction: column;
+        -webkit-box-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+        background: transparent;
+        width: 48px;
+        height: 48px;
+        -webkit-box-flex: 0;
+        -webkit-flex: none;
+        flex: none;
+        -webkit-box-ordinal-group: 2;
+        -webkit-order: 1;
+        order: 1;
+        -webkit-flex-grow: 0;
+        flex-grow: 0;
+        cursor: pointer;
+        pointer-events: auto;
+        border: none;
+        padding: 0
+      }
+
+      .ddl-modal-close-icon {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: row;
+        flex-direction: row;
+        -webkit-box-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        background: rgba(68, 71, 70, 0);
+        -webkit-transition: background .2s;
+        -o-transition: background .2s;
+        transition: background .2s
+      }
+
+      .ddl-modal-close-icon:hover {
+        background: rgba(68, 71, 70, .08)
+      }
+
+      .ddl-modal-close-icon:active {
+        background: rgba(68, 71, 70, .12)
+      }
+
+      .ddl-closing .ddl-modal-close-icon {
+        pointer-events: none
+      }
+
+      .ddl-modal-content {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: column;
+        flex-direction: column;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+        padding: 8px 24px;
+        gap: 24px;
+        height: 224px;
+        -webkit-box-flex: 0;
+        -webkit-flex: none;
+        flex: none;
+        -webkit-box-ordinal-group: 4;
+        -webkit-order: 3;
+        order: 3;
+        -webkit-flex-grow: 0;
+        flex-grow: 0;
+        z-index: 1
+      }
+
+      .ddl-modal-buttons {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: row;
+        flex-direction: row;
+        -webkit-box-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+        padding: 0;
+        gap: 24px;
+        width: 316px;
+        height: 108px;
+        -webkit-box-flex: 0;
+        -webkit-flex: none;
+        flex: none;
+        -webkit-box-ordinal-group: 1;
+        -webkit-order: 0;
+        order: 0;
+        -webkit-align-self: stretch;
+        align-self: stretch;
+        -webkit-flex-grow: 0;
+        flex-grow: 0
+      }
+
+      .ddl-modal-button-container {
+        height: 107px;
+        -webkit-box-flex: 0;
+        -webkit-flex: none;
+        flex: none;
+        -webkit-box-ordinal-group: 1;
+        -webkit-order: 0;
+        order: 0;
+        -webkit-flex-grow: 0;
+        flex-grow: 0
+      }
+
+      .ddl-modal-button-label {
+        height: 19px;
+        padding: 8px 0 0;
+        font-family: Google Sans;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 20px;
+        text-align: center;
+        color: #444746
+      }
+
+      .ddl-share-facebook {
+        cursor: pointer;
+        pointer-events: auto;
+        border: none;
+        padding: 0;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        -webkit-transition: background .2s;
+        -o-transition: background .2s;
+        transition: background .2s;
+        background: #3b5998
+      }
+
+      .ddl-share-facebook:hover {
+        background: #324b80
+      }
+
+      .ddl-share-facebook:active {
+        background: #2d4474
+      }
+
+      .ddl-share-twitter {
+        cursor: pointer;
+        pointer-events: auto;
+        border: none;
+        padding: 0;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        -webkit-transition: background .2s;
+        -o-transition: background .2s;
+        transition: background .2s;
+        background: #1da1f2
+      }
+
+      .ddl-share-twitter:hover {
+        background: #1887cb
+      }
+
+      .ddl-share-twitter:active {
+        background: #167ab8
+      }
+
+      .ddl-share-facebook-icon {
+        padding: 22.5px 30.5px
+      }
+
+      .ddl-share-email-icon,
+      .ddl-share-twitter-icon {
+        padding: 26px 23px
+      }
+
+      .ddl-modal-copy-link-container {
+        width: 316px;
+        height: 84px;
+        -webkit-box-flex: 0;
+        -webkit-flex: none;
+        flex: none;
+        -webkit-box-ordinal-group: 2;
+        -webkit-order: 1;
+        order: 1;
+        -webkit-align-self: stretch;
+        align-self: stretch;
+        -webkit-flex-grow: 0;
+        flex-grow: 0;
+        pointer-events: auto;
+        cursor: pointer
+      }
+
+      .ddl-modal-copy-link {
+        cursor: pointer;
+        pointer-events: auto;
+        border: none;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-pack: start;
+        -webkit-justify-content: flex-start;
+        justify-content: flex-start;
+        gap: 0;
+        padding: 0;
+        width: 316px;
+        height: 56px;
+        background: #dde3ea;
+        border-radius: 4px;
+        -webkit-transition: background .4s;
+        -o-transition: background .4s;
+        transition: background .4s
+      }
+
+      .ddl-link-copied .ddl-modal-copy-link {
+        pointer-events: none;
+        background-color: #a8c7fa
+      }
+
+      .ddl-modal-copy-link-icon {
+        padding: 4px 0;
+        width: 48px;
+        height: 48px;
+        flex-order: 0
+      }
+
+      .ddl-modal-copy-link-icon path {
+        -webkit-transition: fill .4s;
+        -o-transition: fill .4s;
+        transition: fill .4s;
+        fill: #444746
+      }
+
+      .ddl-link-copied .ddl-modal-copy-link-icon path {
+        fill: #041e49
+      }
+
+      .ddl-modal-share-link {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+        cursor: text;
+        height: 24px;
+        padding: 16px 0;
+        -webkit-box-flex: 0;
+        -webkit-flex: none;
+        flex: none;
+        -webkit-box-ordinal-group: 2;
+        -webkit-order: 1;
+        order: 1;
+        -webkit-flex-grow: 0;
+        flex-grow: 0;
+        max-width: 268px;
+        font-family: Google Sans Text;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 24px;
+        color: #1f1f1f;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-transition: color .4s;
+        -o-transition: color .4s;
+        transition: color .4s
+      }
+
+      .ddl-link-copied .ddl-modal-share-link {
+        color: #041e49
+      }
+
+      .ddl-modal-help-text {
+        font-family: Google Sans Text;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 20px;
+        text-align: center;
+        color: #444746;
+        padding: 8px
+      }
+
+      .ddl-modal-snack-bar {
+        position: absolute;
+        bottom: -50px;
+        visibility: hidden
+      }
+
+      .ddl-with-snack-bar .ddl-modal-snack-bar {
+        width: 116px;
+        height: 47px;
+        bottom: -50px;
+        left: 124px;
+        margin: 0 auto;
+        background: #303030;
+        border-radius: 4px 4px 0 0;
+        font-family: Google Sans Text;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 47px;
+        text-align: center;
+        color: #f2f2f2;
+        z-index: 2;
+        -webkit-animation: ddl-snack-bar-in .4s 1 forwards, ddl-snack-bar-out .4s 2.4s 1 forwards;
+        animation: ddl-snack-bar-in .4s 1 forwards, ddl-snack-bar-out .4s 2.4s 1 forwards;
+        visibility: visible
+      }
+
+      @-webkit-keyframes ddl-snack-bar-in {
+        0% {
+          bottom: -50px
+        }
+
+        to {
+          bottom: 0
+        }
+      }
+
+      @keyframes ddl-snack-bar-in {
+        0% {
+          bottom: -50px
+        }
+
+        to {
+          bottom: 0
+        }
+      }
+
+      @-webkit-keyframes ddl-snack-bar-out {
+        0% {
+          bottom: 0
+        }
+
+        to {
+          bottom: -50px
+        }
+      }
+
+      @keyframes ddl-snack-bar-out {
+        0% {
+          bottom: 0
+        }
+
+        to {
+          bottom: -50px
+        }
+      }
+
+      .caption {
+        line-height: normal
+      }
+
+      .captionContainer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        pointer-events: none
+      }
+
+      .captionContainerBottomCenter {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        text-align: center;
+        -webkit-box-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-transition: margin-bottom .25s ease-in, margin-top .25s ease-in;
+        -o-transition: margin-bottom .25s ease-in, margin-top .25s ease-in;
+        transition: margin-bottom .25s ease-in, margin-top .25s ease-in
+      }
+
+      .captionText {
+        visibility: visible;
+        word-wrap: normal;
+        overflow-wrap: normal;
+        display: block
+      }
+
+      .captionText[data-state=disabled] {
+        visibility: hidden
+      }
+
+      .captionLine {
+        visibility: inherit;
+        display: block;
+        padding-top: 0
+      }
+
+      .captionSegment {
+        visibility: inherit;
+        display: inline-block;
+        white-space: pre-wrap
+      }
+
+      .captionSegment * {
+        vertical-align: bottom;
+        display: inline-block;
+        max-height: 1em
+      }
+
+      .captionLine .captionSegment:first-child {
+        padding-left: .25em
+      }
+
+      .captionLine .captionSegment:last-child {
+        padding-right: .25em
+      }
+
+      .captionIcon {
+        background-position: 50%;
+        background-repeat: "no-repeat";
+        -webkit-background-size: 42px 42px;
+        background-size: 42px 42px;
+        width: 42px;
+        height: 42px;
+        -webkit-filter: invert(100%);
+        filter: invert(100%)
+      }
+
+      .captionToggleButton {
+        width: 42px;
+        height: 42px;
+        margin: 10px;
+        outline: none;
+        border: 0;
+        padding: 0;
+        background-color: transparent
+      }
+
+      .captionToggleButton[data-state=enabled]>.captionIcon {
+        background-image: url(https://fonts.gstatic.com/s/i/googlematerialicons/closed_caption/v10/24px.svg)
+      }
+
+      .captionToggleButton[data-state=disabled]>.captionIcon {
+        background-image: url(https://fonts.gstatic.com/s/i/googlematerialicons/closed_caption_disabled/v6/24px.svg)
+      }
+
+      .captionToggleButton:hover {
+        -webkit-transform: scale(1.2);
+        -ms-transform: scale(1.2);
+        -o-transform: scale(1.2);
+        transform: scale(1.2)
+      }
+
+      .captionToggleButton:active {
+        -webkit-transform: scale(.8);
+        -ms-transform: scale(.8);
+        -o-transform: scale(.8);
+        transform: scale(.8);
+        -webkit-filter: contrast(.75);
+        filter: contrast(.75)
+      }
+
+      .captionContainerBottomCenter {
+        left: 50%;
+        -webkit-transform: translate(-50%);
+        -ms-transform: translate(-50%);
+        -o-transform: translate(-50%);
+        transform: translate(-50%);
+        width: 452px;
+        padding: 44px;
+        bottom: 8%
+      }
+
+      .captionContainer {
+        opacity: 0;
+        -webkit-transition: opacity .7s;
+        -o-transition: opacity .7s;
+        transition: opacity .7s;
+        -webkit-animation: caption-fade-in .7s 1;
+        -o-animation: caption-fade-in .7s 1;
+        animation: caption-fade-in .7s 1
+      }
+
+      @keyframes caption-fade-in {
+        0% {
+          opacity: 0
+        }
+
+        to {
+          opacity: 1
+        }
+      }
+
+      .showingCaption .captionContainer {
+        opacity: 1
+      }
+
+      .captionSegment {
+        line-height: 24px;
+        padding-top: 4px;
+        padding-bottom: 4px
+      }
+
+      .endScreen {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        -webkit-animation: 1s ease-out 1s 1 normal both running showEndScreen;
+        -o-animation: 1s ease-out 1s 1 normal both running showEndScreen;
+        animation: 1s ease-out 1s 1 normal both running showEndScreen
+      }
+
+      .endScreenContent {
+        position: absolute;
+        width: 100%;
+        height: 30%;
+        bottom: 90px;
+        display: -webkit-box;
+        display: -moz-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-direction: column;
+        -webkit-flex-direction: column;
+        flex-direction: column;
+        -webkit-justify-content: flex-end;
+        justify-content: flex-end
+      }
+
+      @keyframes showEndScreen {
+        0% {
+          opacity: 0
+        }
+
+        to {
+          opacity: 1
+        }
+      }
+
+      .endScreenText {
+        font-family: "Google Sans";
+        font-style: normal;
+        font-weight: 500;
+        font-size: 32px;
+        line-height: 48px;
+        text-align: center;
+        margin: 0 24px;
+        color: #fff
+      }
+
+      .buttonReplay {
+        cursor: pointer;
+        pointer-events: auto;
+        border: none;
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        bottom: 18px;
+        gap: 12px;
+        transition: background .2s;
+        background: rgba(0, 0, 0, .6);
+        box-shadow: 0 4px 8px 3px rgba(60, 64, 67, .15), 0 1px 3px rgba(60, 64, 67, .3);
+        border-radius: 80px;
+        right: 83px
+      }
+
+      .paused .buttonReplay {
+        pointer-events: none
+      }
+
+      .replayIcon {
+        padding: 10.5px 13px 11.5px 13px
+      }
+
+      .buttonSearch {
+        cursor: pointer;
+        pointer-events: auto;
+        border: none;
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        bottom: 18px;
+        gap: 12px;
+        transition: background .2s;
+        background: rgba(0, 0, 0, .6);
+        box-shadow: 0 4px 8px 3px rgba(60, 64, 67, .15), 0 1px 3px rgba(60, 64, 67, .3);
+        border-radius: 80px;
+        right: 23px
+      }
+
+      .buttonReplay:hover,
+      .buttonSearch:hover {
+        background: rgba(0, 0, 0, .7)
+      }
+
+      .paused .buttonSearch {
+        pointer-events: none
+      }
+
+      .searchIcon {
+        padding: 13px 14px 14px 13px
+      }
+
+      #hplogo {
+        -webkit-transition: opacity 200ms;
+        -o-transition: opacity 200ms;
+        transition: opacity 200ms
+      }
+
+      #hpcanvas {
+        background: #fff
+      }
+
+      .expanderHide {
+        opacity: 0
+      }
+
+      .ctaAnimated .storybookCta {
+        display: none
+      }
+
+      .ctaAnimated #storybook-cta-animated {
+        display: block
+      }
+
+      .closeFullscreenBtn {
+        z-index: 3000
+      }
+
+      .buttonInactive {
+        pointer-events: none !important
+      }
+
+      .persistentUi,
+      .slideControls {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 100%
+      }
+
+      .paginationContainer {
+        display: -webkit-box;
+        display: -moz-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-direction: row;
+        -webkit-flex-direction: row;
+        flex-direction: row;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-align-items: center;
+        align-items: center;
+        padding: 0;
+        gap: 4px;
+        opacity: 1;
+        -webkit-transition: opacity 1s;
+        -o-transition: opacity 1s;
+        transition: opacity 1s;
+        position: absolute;
+        width: 150px;
+        height: 48px;
+        left: 374px;
+        top: 894px;
+        background: rgba(0, 0, 0, .8);
+        -webkit-border-radius: 60px;
+        -moz-border-radius: 60px;
+        border-radius: 60px
+      }
+
+      .closingPagination .paginationContainer {
+        opacity: 0
+      }
+
+      .paginationNumbers {
+        font-family: "Google Sans";
+        font-style: normal;
+        font-weight: 500;
+        font-size: 18px;
+        line-height: 36px;
+        text-align: center;
+        letter-spacing: 1px;
+        color: #f2f2f2;
+        -webkit-box-flex: none;
+        -moz-box-flex: none;
+        -ms-flex: none;
+        -webkit-flex: none;
+        flex: none;
+        -webkit-box-ordinal-group: 1;
+        -moz-box-ordinal-group: 1;
+        -ms-flex-order: 1;
+        -webkit-order: 1;
+        order: 1;
+        -webkit-box-flex: 0;
+        box-flex: 0;
+        -ms-flex-positive: 0;
+        -webkit-flex-grow: 0;
+        flex-grow: 0
+      }
+
+      .buttonBack {
+        position: absolute;
+        cursor: pointer;
+        pointer-events: auto;
+        border: none;
+        width: 48px;
+        height: 48px;
+        flex: none;
+        flex-grow: 0;
+        left: 2px;
+        -webkit-box-ordinal-group: 0;
+        -moz-box-ordinal-group: 0;
+        -ms-flex-order: 0;
+        -webkit-order: 0;
+        order: 0
+      }
+
+      .navigationDisabled .buttonBack {
+        pointer-events: none
+      }
+
+      .navigationIcon {
+        -webkit-transition: opacity .2s;
+        -o-transition: opacity .2s;
+        transition: opacity .2s;
+        -webkit-transform: translate3d(0, 0, 0);
+        -ms-transform: translate3d(0, 0, 0);
+        -o-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0)
+      }
+
+      .buttonNext {
+        position: absolute;
+        cursor: pointer;
+        pointer-events: auto;
+        border: none;
+        width: 48px;
+        height: 48px;
+        flex: none;
+        flex-grow: 0;
+        right: 2px;
+        -webkit-box-ordinal-group: 2;
+        -moz-box-ordinal-group: 2;
+        -ms-flex-order: 2;
+        -webkit-order: 2;
+        order: 2
+      }
+
+      .navigationDisabled .buttonNext {
+        pointer-events: none
+      }
+
+      .inactiveNavigation {
+        cursor: auto;
+        opacity: .2
+      }
+
+      .inactiveNavigation .navigationButtonCircle:hover {
+        background: none
+      }
+
+      .navigationButtonCircle {
+        width: 36px;
+        height: 36px;
+        margin: 6px;
+        -webkit-box-flex: none;
+        -moz-box-flex: none;
+        -ms-flex: none;
+        -webkit-flex: none;
+        flex: none;
+        -webkit-box-flex: 0;
+        box-flex: 0;
+        -ms-flex-positive: 0;
+        -webkit-flex-grow: 0;
+        flex-grow: 0;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
+        -webkit-transition: background .2s;
+        -o-transition: background .2s;
+        transition: background .2s;
+        background: rgba(237, 239, 241, 0)
+      }
+
+      .navigationButtonCircle:hover {
+        background: rgba(237, 239, 241, .3)
+      }
+
+      .bottomGradient {
+        position: absolute;
+        top: 840px;
+        right: 0;
+        width: 100%;
+        bottom: 0;
+        background: linear-gradient(360deg, rgba(1, 1, 1, .0001) 0%, rgba(1, 1, 1, .4) 100%);
+        mix-blend-mode: multiply;
+        -webkit-transform: rotate(-180deg);
+        -ms-transform: rotate(-180deg);
+        -o-transform: rotate(-180deg);
+        transform: rotate(-180deg)
+      }
+
+      .buttonShare {
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        left: 16px;
+        bottom: 18px;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
+        -webkit-transition: background .2s;
+        -o-transition: background .2s;
+        transition: background .2s;
+        cursor: pointer;
+        pointer-events: auto;
+        border: none;
+        background: rgba(0, 0, 0, .6)
+      }
+
+      .buttonShare:hover {
+        background: rgba(0, 0, 0, .7)
+      }
+
+      .buttonShareIcon {
+        padding: 10px;
+        padding-right: 12px;
+        padding-left: 8px
+      }
+
+      .tapTargetRight {
+        position: absolute;
+        height: 100%;
+        width: 75%;
+        top: 0;
+        right: 0;
+        pointer-events: auto;
+        z-index: -1
+      }
+
+      .navigationDisabled .tapTargetRight {
+        pointer-events: none
+      }
+
+      .tapTargetLeft {
+        position: absolute;
+        height: 100%;
+        width: 25%;
+        top: 0;
+        left: 0;
+        pointer-events: auto;
+        z-index: -1
+      }
+
+      .navigationDisabled .tapTargetLeft {
+        pointer-events: none
+      }
+
+      sentinel {}
+    </style>
+    <div class="lightboxContainer lightboxBackground lightboxEnabled">
+      <div class="lightboxContentContainer" style="max-width: 540px; max-height: 960px;">
+        <div id="ddlDomRoot" class="domRootLightboxed lightboxContent showingCaption" data-width="540" data-height="960"
+          style="position: absolute; top: -168.5px; left: 0px; width: 540px; height: 960px; direction: ltr; transform-origin: center center; transform: scale(0.648958, 0.648958);">
+          <div id="ddlContentRoot" dir="ltr" tabindex="0" aria-hidden="false"><canvas id="hpcanvas" width="540"
+              height="960"></canvas></div>
+          <div id="ctaRoot" class="hplogocta showCta ctaHideDuringLightbox" tabindex="-1" aria-hidden="true"><button
+              id="storybook-cta-container" tabindex="-1" aria-hidden="true" title="Eunice Newton Foote's 204th Birthday"
+              class="">
+              <div class="storybookCta"></div><img src="/logos/2023/storybook/foote-27260/cta.gif"
+                id="storybook-cta-animated" class="storybookCta" alt="">
+            </button></div><canvas width="52" height="52" role="button" aria-label="Close" tabindex="0"
+            class="closeFullscreenBtn" aria-hidden="false"
+            style="top: 10px; right: 10px; width: 52px; height: 52px; cursor: pointer; position: absolute; pointer-events: all; background: none; display: none;"></canvas>
+          <div aria-live="assertive" class="captionContainer captionContainerBottomCenter" tabindex="0"
+            aria-hidden="false">
+            <div class="caption" style="text-align: center; background: rgba(0, 0, 0, 0);"><span
+                class="captionText"><span class="captionLine"><span class="captionSegment"
+                    style="background: rgba(0, 0, 0, 0.8); font-family: Roboto, &quot;Arial Unicode Ms&quot;, Arial, Helvetica, Verdana, &quot;PT Sans Caption&quot;, sans-serif; font-style: normal; font-weight: normal; vertical-align: baseline; font-size: 20px; color: rgb(255, 255, 255); fill: rgb(255, 255, 255);">‪Eunice
+                    Newton Foote was the first to discover the alarming effects of carbon dioxide in the atmosphere in
+                    1856. Today, this is known as the "greenhouse effect."‬</span></span></span></div>
+          </div>
+          <div class="persistentUi" tabindex="0" aria-hidden="false">
+            <div class="bottomGradient"></div>
+            <div class="buttonShare" title="‪Share‬">
+              <div class="buttonShareIcon"><svg fill="none" height="28" viewBox="0 0 28 28" width="28"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path clip-rule="evenodd"
+                    d="m18.6317 19.6117c.6183-.5833 1.4466-.945 2.3683-.945 1.9367 0 3.5 1.5633 3.5 3.5s-1.5633 3.5-3.5 3.5-3.5-1.5633-3.5-3.5c0-.28.0467-.5483.105-.805l-8.225-4.8067c-.63.5834-1.45833.945-2.38.945-1.93667 0-3.5-1.5633-3.5-3.5 0-1.9366 1.56333-3.5 3.5-3.5.92167 0 1.75.3617 2.38.945l8.225-4.79496c-.0583-.25667-.105-.53667-.105-.81667 0-1.93666 1.5633-3.5 3.5-3.5s3.5 1.56334 3.5 3.5c0 1.93667-1.5633 3.5-3.5 3.5-.9217 0-1.7617-.36166-2.38-.945l-8.225 4.79503c.0583.2683.105.5366.105.8166s-.0467.5484-.105.8167zm3.535-13.77833c0-.64166-.525-1.16666-1.1667-1.16666s-1.1667.525-1.1667 1.16666c0 .64167.525 1.16667 1.1667 1.16667s1.1667-.525 1.1667-1.16667zm-15.1667 9.33333c-.64167 0-1.16667-.525-1.16667-1.1667 0-.6416.525-1.1666 1.16667-1.1666s1.16667.525 1.16667 1.1666c0 .6417-.525 1.1667-1.16667 1.1667zm12.8333 7c0 .6417.525 1.1667 1.1667 1.1667s1.1667-.525 1.1667-1.1667-.525-1.1667-1.1667-1.1667-1.1667.525-1.1667 1.1667z"
+                    fill="#f2f2f2" fill-rule="evenodd"></path>
+                </svg></div>
+            </div>
+          </div>
+          <div class="slideControls" tabindex="0" aria-hidden="false">
+            <div class="paginationContainer">
+              <div class="buttonBack inactiveNavigation" title="‪Back‬">
+                <div class="navigationButtonCircle">
+                  <div class="navigationIcon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <mask id="mask0-323-15445" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="12" y="9"
+                        width="12" height="18">
+                        <path d="M23.115 11.115L21 9L12 18L21 27L23.115 24.885L16.245 18L23.115 11.115Z" fill="white">
+                        </path>
+                      </mask>
+                      <g mask="url(#mask0-323-15445)">
+                        <rect width="36" height="36" fill="#F2F2F2"></rect>
+                      </g>
+                    </svg></div>
+                </div>
+              </div>
+              <div class="paginationNumbers">1/11</div>
+              <div class="buttonNext" title="‪Next‬">
+                <div class="navigationButtonCircle">
+                  <div class="navigationIcon"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <mask id="mask0-323-15459" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="12" y="9"
+                        width="12" height="18">
+                        <path d="M15 9L12.885 11.115L19.755 18L12.885 24.885L15 27L24 18L15 9Z" fill="white"></path>
+                      </mask>
+                      <g mask="url(#mask0-323-15459)">
+                        <rect width="36" height="36" fill="#F2F2F2"></rect>
+                      </g>
+                    </svg></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><canvas width="52" height="52" role="button" aria-label="Close" tabindex="0"
+        style="top: 10px; right: 10px; width: 52px; height: 52px; cursor: pointer; position: absolute; pointer-events: all; background: none; display: block;"></canvas>
+    </div>
+  </div> class="lightboxMode">
+  <style>
+    .hplogocta {
+      width: 100%;
+      height: 100%;
+      -webkit-background-size: contain;
+      background-size: contain;
+      background-position: center;
+      border: none;
+      overflow: hidden;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 10;
+      cursor: pointer;
+      padding: 0;
+      -webkit-transition: opacity .5s;
+      -o-transition: opacity .5s;
+      transition: opacity .5s;
+      opacity: 0;
+      pointer-events: auto
+    }
+
+    .hplogocta.showCta {
+      opacity: 1
+    }
+
+    .hplogocta.ctaHideDuringLightbox {
+      display: none
+    }
+
+    .closeFullscreenBtn {
+      pointer-events: all;
+      cursor: pointer;
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      z-index: 3000
+    }
+
+    .domRootLightboxed {
+      left: 0;
+      top: 0
+    }
+
+    .contentHide {
+      display: none
+    }
+
+    #ddlDomRoot {
+      pointer-events: none
+    }
+
+    .lightboxMode,
+    #hplogo.lightboxMode {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      z-index: 1000;
+      overflow: hidden
+    }
+
+    .lightboxContentContainer {
+      position: relative;
+      height: 100%;
+      width: 100%
+    }
+
+    .lightboxEnabled .lightboxContentContainer {
+      height: 90%;
+      width: 90%
+    }
+
+    .lightboxContent {
+      -webkit-transform-origin: 0 0;
+      -ms-transform-origin: 0 0;
+      -o-transform-origin: 0 0;
+      transform-origin: 0 0
+    }
+
+    .lightboxContainer {
+      position: absolute;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0
+    }
+
+    .lightboxBackground {
+      opacity: 0;
+      background-color: rgba(0, 0, 0, .8)
+    }
+
+    .lightboxEnabled {
+      opacity: 1;
+      -webkit-transition: opacity .5s;
+      -o-transition: opacity .5s;
+      transition: opacity .5s
+    }
+
+    .ddl-share-modal {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+      align-items: center
+    }
+
+    .ddl-modal-overlay {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      left: 0;
+      top: 0;
+      background: #000;
+      border-radius: 0;
+      opacity: .32;
+      -webkit-transition: opacity .15s;
+      -o-transition: opacity .15s;
+      transition: opacity .15s;
+      -webkit-animation: ddl-overlay-fade-in .15s 1;
+      animation: ddl-overlay-fade-in .15s 1
+    }
+
+    .ddl-closing .ddl-modal-overlay {
+      opacity: 0
+    }
+
+    @-webkit-keyframes ddl-overlay-fade-in {
+      0% {
+        opacity: 0
+      }
+
+      to {
+        opacity: .32
+      }
+    }
+
+    @keyframes ddl-overlay-fade-in {
+      0% {
+        opacity: 0
+      }
+
+      to {
+        opacity: .32
+      }
+    }
+
+    .ddl-modal-dialog {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-box-align: start;
+      -webkit-align-items: flex-start;
+      align-items: flex-start;
+      margin: 0 0 24px;
+      isolation: isolate;
+      position: absolute;
+      width: 364px;
+      height: 328px;
+      left: 88px;
+      top: 308px;
+      background: #fff;
+      border-radius: 16px;
+      opacity: 1;
+      -webkit-transition: opacity .15s;
+      -o-transition: opacity .15s;
+      transition: opacity .15s;
+      -webkit-animation: ddl-dialog-fade-in 83ms 1, ddl-dialog-grow-in .15s 1;
+      animation: ddl-dialog-fade-in 83ms 1, ddl-dialog-grow-in .15s 1;
+      overflow: hidden
+    }
+
+    @-webkit-keyframes ddl-dialog-fade-in {
+      0% {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes ddl-dialog-fade-in {
+      0% {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @-webkit-keyframes ddl-dialog-grow-in {
+      0% {
+        scale: .8
+      }
+
+      to {
+        scale: 1
+      }
+    }
+
+    @keyframes ddl-dialog-grow-in {
+      0% {
+        scale: .8
+      }
+
+      to {
+        scale: 1
+      }
+    }
+
+    .ddl-closing .ddl-modal-dialog {
+      opacity: 0
+    }
+
+    .ddl-modal-header {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: row;
+      flex-direction: row;
+      -webkit-box-align: start;
+      -webkit-align-items: flex-start;
+      align-items: flex-start;
+      padding-top: 12px;
+      padding-bottom: 0;
+      -webkit-padding-start: 24px;
+      -moz-padding-start: 24px;
+      padding-inline-start: 24px;
+      -webkit-padding-end: 12px;
+      -moz-padding-end: 12px;
+      padding-inline-end: 12px;
+      height: 61px;
+      -webkit-box-flex: 0;
+      -webkit-flex: none;
+      flex: none;
+      -webkit-box-ordinal-group: 1;
+      -webkit-order: 0;
+      order: 0;
+      -webkit-align-self: stretch;
+      align-self: stretch;
+      -webkit-flex-grow: 0;
+      flex-grow: 0;
+      z-index: 0
+    }
+
+    .ddl-modal-header-text {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: row;
+      flex-direction: row;
+      -webkit-box-align: end;
+      -webkit-align-items: flex-end;
+      align-items: flex-end;
+      padding: 12px 0 0;
+      gap: 10px;
+      width: 280px;
+      height: 36px;
+      -webkit-box-flex: 0;
+      -webkit-flex: none;
+      flex: none;
+      -webkit-box-ordinal-group: 1;
+      -webkit-order: 0;
+      order: 0;
+      -webkit-box-flex: 1;
+      -webkit-flex-grow: 1;
+      flex-grow: 1;
+      font-family: Google Sans;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 28px;
+      line-height: 36px
+    }
+
+    .ddl-modal-close {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+      background: transparent;
+      width: 48px;
+      height: 48px;
+      -webkit-box-flex: 0;
+      -webkit-flex: none;
+      flex: none;
+      -webkit-box-ordinal-group: 2;
+      -webkit-order: 1;
+      order: 1;
+      -webkit-flex-grow: 0;
+      flex-grow: 0;
+      cursor: pointer;
+      pointer-events: auto;
+      border: none;
+      padding: 0
+    }
+
+    .ddl-modal-close-icon {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: row;
+      flex-direction: row;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      background: rgba(68, 71, 70, 0);
+      -webkit-transition: background .2s;
+      -o-transition: background .2s;
+      transition: background .2s
+    }
+
+    .ddl-modal-close-icon:hover {
+      background: rgba(68, 71, 70, .08)
+    }
+
+    .ddl-modal-close-icon:active {
+      background: rgba(68, 71, 70, .12)
+    }
+
+    .ddl-closing .ddl-modal-close-icon {
+      pointer-events: none
+    }
+
+    .ddl-modal-content {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+      padding: 8px 24px;
+      gap: 24px;
+      height: 224px;
+      -webkit-box-flex: 0;
+      -webkit-flex: none;
+      flex: none;
+      -webkit-box-ordinal-group: 4;
+      -webkit-order: 3;
+      order: 3;
+      -webkit-flex-grow: 0;
+      flex-grow: 0;
+      z-index: 1
+    }
+
+    .ddl-modal-buttons {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: row;
+      flex-direction: row;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+      padding: 0;
+      gap: 24px;
+      width: 316px;
+      height: 108px;
+      -webkit-box-flex: 0;
+      -webkit-flex: none;
+      flex: none;
+      -webkit-box-ordinal-group: 1;
+      -webkit-order: 0;
+      order: 0;
+      -webkit-align-self: stretch;
+      align-self: stretch;
+      -webkit-flex-grow: 0;
+      flex-grow: 0
+    }
+
+    .ddl-modal-button-container {
+      height: 107px;
+      -webkit-box-flex: 0;
+      -webkit-flex: none;
+      flex: none;
+      -webkit-box-ordinal-group: 1;
+      -webkit-order: 0;
+      order: 0;
+      -webkit-flex-grow: 0;
+      flex-grow: 0
+    }
+
+    .ddl-modal-button-label {
+      height: 19px;
+      padding: 8px 0 0;
+      font-family: Google Sans;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
+      text-align: center;
+      color: #444746
+    }
+
+    .ddl-share-facebook {
+      cursor: pointer;
+      pointer-events: auto;
+      border: none;
+      padding: 0;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      -webkit-transition: background .2s;
+      -o-transition: background .2s;
+      transition: background .2s;
+      background: #3b5998
+    }
+
+    .ddl-share-facebook:hover {
+      background: #324b80
+    }
+
+    .ddl-share-facebook:active {
+      background: #2d4474
+    }
+
+    .ddl-share-twitter {
+      cursor: pointer;
+      pointer-events: auto;
+      border: none;
+      padding: 0;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      -webkit-transition: background .2s;
+      -o-transition: background .2s;
+      transition: background .2s;
+      background: #1da1f2
+    }
+
+    .ddl-share-twitter:hover {
+      background: #1887cb
+    }
+
+    .ddl-share-twitter:active {
+      background: #167ab8
+    }
+
+    .ddl-share-facebook-icon {
+      padding: 22.5px 30.5px
+    }
+
+    .ddl-share-email-icon,
+    .ddl-share-twitter-icon {
+      padding: 26px 23px
+    }
+
+    .ddl-modal-copy-link-container {
+      width: 316px;
+      height: 84px;
+      -webkit-box-flex: 0;
+      -webkit-flex: none;
+      flex: none;
+      -webkit-box-ordinal-group: 2;
+      -webkit-order: 1;
+      order: 1;
+      -webkit-align-self: stretch;
+      align-self: stretch;
+      -webkit-flex-grow: 0;
+      flex-grow: 0;
+      pointer-events: auto;
+      cursor: pointer
+    }
+
+    .ddl-modal-copy-link {
+      cursor: pointer;
+      pointer-events: auto;
+      border: none;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-box-pack: start;
+      -webkit-justify-content: flex-start;
+      justify-content: flex-start;
+      gap: 0;
+      padding: 0;
+      width: 316px;
+      height: 56px;
+      background: #dde3ea;
+      border-radius: 4px;
+      -webkit-transition: background .4s;
+      -o-transition: background .4s;
+      transition: background .4s
+    }
+
+    .ddl-link-copied .ddl-modal-copy-link {
+      pointer-events: none;
+      background-color: #a8c7fa
+    }
+
+    .ddl-modal-copy-link-icon {
+      padding: 4px 0;
+      width: 48px;
+      height: 48px;
+      flex-order: 0
+    }
+
+    .ddl-modal-copy-link-icon path {
+      -webkit-transition: fill .4s;
+      -o-transition: fill .4s;
+      transition: fill .4s;
+      fill: #444746
+    }
+
+    .ddl-link-copied .ddl-modal-copy-link-icon path {
+      fill: #041e49
+    }
+
+    .ddl-modal-share-link {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+      cursor: text;
+      height: 24px;
+      padding: 16px 0;
+      -webkit-box-flex: 0;
+      -webkit-flex: none;
+      flex: none;
+      -webkit-box-ordinal-group: 2;
+      -webkit-order: 1;
+      order: 1;
+      -webkit-flex-grow: 0;
+      flex-grow: 0;
+      max-width: 268px;
+      font-family: Google Sans Text;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 24px;
+      color: #1f1f1f;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-transition: color .4s;
+      -o-transition: color .4s;
+      transition: color .4s
+    }
+
+    .ddl-link-copied .ddl-modal-share-link {
+      color: #041e49
+    }
+
+    .ddl-modal-help-text {
+      font-family: Google Sans Text;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
+      text-align: center;
+      color: #444746;
+      padding: 8px
+    }
+
+    .ddl-modal-snack-bar {
+      position: absolute;
+      bottom: -50px;
+      visibility: hidden
+    }
+
+    .ddl-with-snack-bar .ddl-modal-snack-bar {
+      width: 116px;
+      height: 47px;
+      bottom: -50px;
+      left: 124px;
+      margin: 0 auto;
+      background: #303030;
+      border-radius: 4px 4px 0 0;
+      font-family: Google Sans Text;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 47px;
+      text-align: center;
+      color: #f2f2f2;
+      z-index: 2;
+      -webkit-animation: ddl-snack-bar-in .4s 1 forwards, ddl-snack-bar-out .4s 2.4s 1 forwards;
+      animation: ddl-snack-bar-in .4s 1 forwards, ddl-snack-bar-out .4s 2.4s 1 forwards;
+      visibility: visible
+    }
+
+    @-webkit-keyframes ddl-snack-bar-in {
+      0% {
+        bottom: -50px
+      }
+
+      to {
+        bottom: 0
+      }
+    }
+
+    @keyframes ddl-snack-bar-in {
+      0% {
+        bottom: -50px
+      }
+
+      to {
+        bottom: 0
+      }
+    }
+
+    @-webkit-keyframes ddl-snack-bar-out {
+      0% {
+        bottom: 0
+      }
+
+      to {
+        bottom: -50px
+      }
+    }
+
+    @keyframes ddl-snack-bar-out {
+      0% {
+        bottom: 0
+      }
+
+      to {
+        bottom: -50px
+      }
+    }
+
+    .caption {
+      line-height: normal
+    }
+
+    .captionContainer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      pointer-events: none
+    }
+
+    .captionContainerBottomCenter {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: flex;
+      text-align: center;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      -webkit-transition: margin-bottom .25s ease-in, margin-top .25s ease-in;
+      -o-transition: margin-bottom .25s ease-in, margin-top .25s ease-in;
+      transition: margin-bottom .25s ease-in, margin-top .25s ease-in
+    }
+
+    .captionText {
+      visibility: visible;
+      word-wrap: normal;
+      overflow-wrap: normal;
+      display: block
+    }
+
+    .captionText[data-state=disabled] {
+      visibility: hidden
+    }
+
+    .captionLine {
+      visibility: inherit;
+      display: block;
+      padding-top: 0
+    }
+
+    .captionSegment {
+      visibility: inherit;
+      display: inline-block;
+      white-space: pre-wrap
+    }
+
+    .captionSegment * {
+      vertical-align: bottom;
+      display: inline-block;
+      max-height: 1em
+    }
+
+    .captionLine .captionSegment:first-child {
+      padding-left: .25em
+    }
+
+    .captionLine .captionSegment:last-child {
+      padding-right: .25em
+    }
+
+    .captionIcon {
+      background-position: 50%;
+      background-repeat: "no-repeat";
+      -webkit-background-size: 42px 42px;
+      background-size: 42px 42px;
+      width: 42px;
+      height: 42px;
+      -webkit-filter: invert(100%);
+      filter: invert(100%)
+    }
+
+    .captionToggleButton {
+      width: 42px;
+      height: 42px;
+      margin: 10px;
+      outline: none;
+      border: 0;
+      padding: 0;
+      background-color: transparent
+    }
+
+    .captionToggleButton[data-state=enabled]>.captionIcon {
+      background-image: url(https://fonts.gstatic.com/s/i/googlematerialicons/closed_caption/v10/24px.svg)
+    }
+
+    .captionToggleButton[data-state=disabled]>.captionIcon {
+      background-image: url(https://fonts.gstatic.com/s/i/googlematerialicons/closed_caption_disabled/v6/24px.svg)
+    }
+
+    .captionToggleButton:hover {
+      -webkit-transform: scale(1.2);
+      -ms-transform: scale(1.2);
+      -o-transform: scale(1.2);
+      transform: scale(1.2)
+    }
+
+    .captionToggleButton:active {
+      -webkit-transform: scale(.8);
+      -ms-transform: scale(.8);
+      -o-transform: scale(.8);
+      transform: scale(.8);
+      -webkit-filter: contrast(.75);
+      filter: contrast(.75)
+    }
+
+    .captionContainerBottomCenter {
+      left: 50%;
+      -webkit-transform: translate(-50%);
+      -ms-transform: translate(-50%);
+      -o-transform: translate(-50%);
+      transform: translate(-50%);
+      width: 452px;
+      padding: 44px;
+      bottom: 8%
+    }
+
+    .captionContainer {
+      opacity: 0;
+      -webkit-transition: opacity .7s;
+      -o-transition: opacity .7s;
+      transition: opacity .7s;
+      -webkit-animation: caption-fade-in .7s 1;
+      -o-animation: caption-fade-in .7s 1;
+      animation: caption-fade-in .7s 1
+    }
+
+    @keyframes caption-fade-in {
+      0% {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .showingCaption .captionContainer {
+      opacity: 1
+    }
+
+    .captionSegment {
+      line-height: 24px;
+      padding-top: 4px;
+      padding-bottom: 4px
+    }
+
+    .endScreen {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      -webkit-animation: 1s ease-out 1s 1 normal both running showEndScreen;
+      -o-animation: 1s ease-out 1s 1 normal both running showEndScreen;
+      animation: 1s ease-out 1s 1 normal both running showEndScreen
+    }
+
+    .endScreenContent {
+      position: absolute;
+      width: 100%;
+      height: 30%;
+      bottom: 90px;
+      display: -webkit-box;
+      display: -moz-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-direction: column;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-justify-content: flex-end;
+      justify-content: flex-end
+    }
+
+    @keyframes showEndScreen {
+      0% {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .endScreenText {
+      font-family: "Google Sans";
+      font-style: normal;
+      font-weight: 500;
+      font-size: 32px;
+      line-height: 48px;
+      text-align: center;
+      margin: 0 24px;
+      color: #fff
+    }
+
+    .buttonReplay {
+      cursor: pointer;
+      pointer-events: auto;
+      border: none;
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      bottom: 18px;
+      gap: 12px;
+      transition: background .2s;
+      background: rgba(0, 0, 0, .6);
+      box-shadow: 0 4px 8px 3px rgba(60, 64, 67, .15), 0 1px 3px rgba(60, 64, 67, .3);
+      border-radius: 80px;
+      right: 83px
+    }
+
+    .paused .buttonReplay {
+      pointer-events: none
+    }
+
+    .replayIcon {
+      padding: 10.5px 13px 11.5px 13px
+    }
+
+    .buttonSearch {
+      cursor: pointer;
+      pointer-events: auto;
+      border: none;
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      bottom: 18px;
+      gap: 12px;
+      transition: background .2s;
+      background: rgba(0, 0, 0, .6);
+      box-shadow: 0 4px 8px 3px rgba(60, 64, 67, .15), 0 1px 3px rgba(60, 64, 67, .3);
+      border-radius: 80px;
+      right: 23px
+    }
+
+    .buttonReplay:hover,
+    .buttonSearch:hover {
+      background: rgba(0, 0, 0, .7)
+    }
+
+    .paused .buttonSearch {
+      pointer-events: none
+    }
+
+    .searchIcon {
+      padding: 13px 14px 14px 13px
+    }
+
+    #hplogo {
+      -webkit-transition: opacity 200ms;
+      -o-transition: opacity 200ms;
+      transition: opacity 200ms
+    }
+
+    #hpcanvas {
+      background: #fff
+    }
+
+    .expanderHide {
+      opacity: 0
+    }
+
+    .ctaAnimated .storybookCta {
+      display: none
+    }
+
+    .ctaAnimated #storybook-cta-animated {
+      display: block
+    }
+
+    .closeFullscreenBtn {
+      z-index: 3000
+    }
+
+    .buttonInactive {
+      pointer-events: none !important
+    }
+
+    .persistentUi,
+    .slideControls {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 100%
+    }
+
+    .paginationContainer {
+      display: -webkit-box;
+      display: -moz-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-direction: row;
+      -webkit-flex-direction: row;
+      flex-direction: row;
+      -webkit-justify-content: center;
+      justify-content: center;
+      -webkit-align-items: center;
+      align-items: center;
+      padding: 0;
+      gap: 4px;
+      opacity: 1;
+      -webkit-transition: opacity 1s;
+      -o-transition: opacity 1s;
+      transition: opacity 1s;
+      position: absolute;
+      width: 150px;
+      height: 48px;
+      left: 374px;
+      top: 894px;
+      background: rgba(0, 0, 0, .8);
+      -webkit-border-radius: 60px;
+      -moz-border-radius: 60px;
+      border-radius: 60px
+    }
+
+    .closingPagination .paginationContainer {
+      opacity: 0
+    }
+
+    .paginationNumbers {
+      font-family: "Google Sans";
+      font-style: normal;
+      font-weight: 500;
+      font-size: 18px;
+      line-height: 36px;
+      text-align: center;
+      letter-spacing: 1px;
+      color: #f2f2f2;
+      -webkit-box-flex: none;
+      -moz-box-flex: none;
+      -ms-flex: none;
+      -webkit-flex: none;
+      flex: none;
+      -webkit-box-ordinal-group: 1;
+      -moz-box-ordinal-group: 1;
+      -ms-flex-order: 1;
+      -webkit-order: 1;
+      order: 1;
+      -webkit-box-flex: 0;
+      box-flex: 0;
+      -ms-flex-positive: 0;
+      -webkit-flex-grow: 0;
+      flex-grow: 0
+    }
+
+    .buttonBack {
+      position: absolute;
+      cursor: pointer;
+      pointer-events: auto;
+      border: none;
+      width: 48px;
+      height: 48px;
+      flex: none;
+      flex-grow: 0;
+      left: 2px;
+      -webkit-box-ordinal-group: 0;
+      -moz-box-ordinal-group: 0;
+      -ms-flex-order: 0;
+      -webkit-order: 0;
+      order: 0
+    }
+
+    .navigationDisabled .buttonBack {
+      pointer-events: none
+    }
+
+    .navigationIcon {
+      -webkit-transition: opacity .2s;
+      -o-transition: opacity .2s;
+      transition: opacity .2s;
+      -webkit-transform: translate3d(0, 0, 0);
+      -ms-transform: translate3d(0, 0, 0);
+      -o-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0)
+    }
+
+    .buttonNext {
+      position: absolute;
+      cursor: pointer;
+      pointer-events: auto;
+      border: none;
+      width: 48px;
+      height: 48px;
+      flex: none;
+      flex-grow: 0;
+      right: 2px;
+      -webkit-box-ordinal-group: 2;
+      -moz-box-ordinal-group: 2;
+      -ms-flex-order: 2;
+      -webkit-order: 2;
+      order: 2
+    }
+
+    .navigationDisabled .buttonNext {
+      pointer-events: none
+    }
+
+    .inactiveNavigation {
+      cursor: auto;
+      opacity: .2
+    }
+
+    .inactiveNavigation .navigationButtonCircle:hover {
+      background: none
+    }
+
+    .navigationButtonCircle {
+      width: 36px;
+      height: 36px;
+      margin: 6px;
+      -webkit-box-flex: none;
+      -moz-box-flex: none;
+      -ms-flex: none;
+      -webkit-flex: none;
+      flex: none;
+      -webkit-box-flex: 0;
+      box-flex: 0;
+      -ms-flex-positive: 0;
+      -webkit-flex-grow: 0;
+      flex-grow: 0;
+      -webkit-border-radius: 50%;
+      -moz-border-radius: 50%;
+      border-radius: 50%;
+      -webkit-transition: background .2s;
+      -o-transition: background .2s;
+      transition: background .2s;
+      background: rgba(237, 239, 241, 0)
+    }
+
+    .navigationButtonCircle:hover {
+      background: rgba(237, 239, 241, .3)
+    }
+
+    .bottomGradient {
+      position: absolute;
+      top: 840px;
+      right: 0;
+      width: 100%;
+      bottom: 0;
+      background: linear-gradient(360deg, rgba(1, 1, 1, .0001) 0%, rgba(1, 1, 1, .4) 100%);
+      mix-blend-mode: multiply;
+      -webkit-transform: rotate(-180deg);
+      -ms-transform: rotate(-180deg);
+      -o-transform: rotate(-180deg);
+      transform: rotate(-180deg)
+    }
+
+    .buttonShare {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      left: 16px;
+      bottom: 18px;
+      -webkit-border-radius: 50%;
+      -moz-border-radius: 50%;
+      border-radius: 50%;
+      -webkit-transition: background .2s;
+      -o-transition: background .2s;
+      transition: background .2s;
+      cursor: pointer;
+      pointer-events: auto;
+      border: none;
+      background: rgba(0, 0, 0, .6)
+    }
+
+    .buttonShare:hover {
+      background: rgba(0, 0, 0, .7)
+    }
+
+    .buttonShareIcon {
+      padding: 10px;
+      padding-right: 12px;
+      padding-left: 8px
+    }
+
+    .tapTargetRight {
+      position: absolute;
+      height: 100%;
+      width: 75%;
+      top: 0;
+      right: 0;
+      pointer-events: auto;
+      z-index: -1
+    }
+
+    .navigationDisabled .tapTargetRight {
+      pointer-events: none
+    }
+
+    .tapTargetLeft {
+      position: absolute;
+      height: 100%;
+      width: 25%;
+      top: 0;
+      left: 0;
+      pointer-events: auto;
+      z-index: -1
+    }
+
+    .navigationDisabled .tapTargetLeft {
+      pointer-events: none
+    }
+
+    sentinel {}
+  </style>
+  <div class="lightboxContainer lightboxBackground lightboxEnabled">
+    <div class="lightboxContentContainer" style="max-width: 540px; max-height: 960px;">
+      <div id="ddlDomRoot" class="domRootLightboxed lightboxContent" data-width="540" data-height="960"
+        style="position: absolute; top: -168.5px; left: 0px; width: 540px; height: 960px; direction: ltr; transform-origin: center center; transform: scale(0.648958, 0.648958);">
+        <div id="ddlContentRoot" dir="ltr" tabindex="0" aria-hidden="false"><canvas id="hpcanvas" width="540"
+            height="960"></canvas></div>
+        <div id="ctaRoot" class="hplogocta showCta ctaHideDuringLightbox" tabindex="-1" aria-hidden="true"><button
+            id="storybook-cta-container" tabindex="-1" aria-hidden="true" title="Eunice Newton Foote's 204th Birthday"
+            class="">
+            <div class="storybookCta"></div><img src="/logos/2023/storybook/foote-27260/cta.gif"
+              id="storybook-cta-animated" class="storybookCta" alt="">
+          </button></div><canvas width="52" height="52" role="button" aria-label="Close" tabindex="0"
+          class="closeFullscreenBtn" aria-hidden="false"
+          style="top: 10px; right: 10px; width: 52px; height: 52px; cursor: pointer; position: absolute; pointer-events: all; background: none; display: none;"></canvas>
+        <div aria-live="assertive" class="captionContainer captionContainerBottomCenter" tabindex="0"
+          aria-hidden="false">
+          <div class="caption" style="text-align: center; background: rgba(0, 0, 0, 0);"><span
+              class="captionText"></span></div>
+        </div>
+        <div class="persistentUi" tabindex="0" aria-hidden="false">
+          <div class="bottomGradient"></div>
+          <div class="buttonShare" title="‪Share‬">
+            <div class="buttonShareIcon"><svg fill="none" height="28" viewBox="0 0 28 28" width="28"
+                xmlns="http://www.w3.org/2000/svg">
+                <path clip-rule="evenodd"
+                  d="m18.6317 19.6117c.6183-.5833 1.4466-.945 2.3683-.945 1.9367 0 3.5 1.5633 3.5 3.5s-1.5633 3.5-3.5 3.5-3.5-1.5633-3.5-3.5c0-.28.0467-.5483.105-.805l-8.225-4.8067c-.63.5834-1.45833.945-2.38.945-1.93667 0-3.5-1.5633-3.5-3.5 0-1.9366 1.56333-3.5 3.5-3.5.92167 0 1.75.3617 2.38.945l8.225-4.79496c-.0583-.25667-.105-.53667-.105-.81667 0-1.93666 1.5633-3.5 3.5-3.5s3.5 1.56334 3.5 3.5c0 1.93667-1.5633 3.5-3.5 3.5-.9217 0-1.7617-.36166-2.38-.945l-8.225 4.79503c.0583.2683.105.5366.105.8166s-.0467.5484-.105.8167zm3.535-13.77833c0-.64166-.525-1.16666-1.1667-1.16666s-1.1667.525-1.1667 1.16666c0 .64167.525 1.16667 1.1667 1.16667s1.1667-.525 1.1667-1.16667zm-15.1667 9.33333c-.64167 0-1.16667-.525-1.16667-1.1667 0-.6416.525-1.1666 1.16667-1.1666s1.16667.525 1.16667 1.1666c0 .6417-.525 1.1667-1.16667 1.1667zm12.8333 7c0 .6417.525 1.1667 1.1667 1.1667s1.1667-.525 1.1667-1.1667-.525-1.1667-1.1667-1.1667-1.1667.525-1.1667 1.1667z"
+                  fill="#f2f2f2" fill-rule="evenodd"></path>
+              </svg></div>
+          </div>
+        </div>
+        <div class="endScreen">
+          <div class="endScreenContent">
+            <div class="endScreenText"></div>
+          </div>
+          <div class="buttonReplay" title="‪Replay‬">
+            <div class="replayIcon"><svg width="22" height="26" viewBox="0 0 22 26" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M11 4.66668C10.755 4.66668 10.51 4.69002 10.2767 4.71335L12.4117 2.57835L10.7667 0.93335L5.855 5.83335L10.7667 10.745L12.4117 9.10002L10.37 7.05835C10.58 7.03502 10.7783 7.00002 11 7.00002C15.5033 7.00002 19.1667 10.6634 19.1667 15.1667C19.1667 19.67 15.5033 23.3334 11 23.3334C6.49667 23.3334 2.83333 19.67 2.83333 15.1667H0.5C0.5 20.965 5.20167 25.6667 11 25.6667C16.7983 25.6667 21.5 20.965 21.5 15.1667C21.5 9.36835 16.7983 4.66668 11 4.66668Z"
+                  fill="#F2F2F2"></path>
+              </svg></div>
+          </div>
+          <div class="buttonSearch" title="‪Search‬">
+            <div class="searchIcon"><svg width="21" height="21" viewBox="0 0 21 21" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M14.22 12.4817L20.905 19.1667L19.1667 20.905L12.4817 14.22C11.2333 15.1183 9.72833 15.6667 8.08333 15.6667C3.895 15.6667 0.5 12.2717 0.5 8.08333C0.5 3.895 3.895 0.5 8.08333 0.5C12.2717 0.5 15.6667 3.895 15.6667 8.08333C15.6667 9.72833 15.1183 11.2333 14.22 12.4817ZM8.08333 2.83333C5.17833 2.83333 2.83333 5.17833 2.83333 8.08333C2.83333 10.9883 5.17833 13.3333 8.08333 13.3333C10.9883 13.3333 13.3333 10.9883 13.3333 8.08333C13.3333 5.17833 10.9883 2.83333 8.08333 2.83333Z"
+                  fill="#F2F2F2"></path>
+              </svg></div>
+          </div>
+        </div>
+      </div>
+    </div><canvas width="52" height="52" role="button" aria-label="Close" tabindex="0"
+      style="top: 10px; right: 10px; width: 52px; height: 52px; cursor: pointer; position: absolute; pointer-events: all; background: none; display: block;"></canvas>
+  </div>
   </div>
 </body>
+
 </html>
